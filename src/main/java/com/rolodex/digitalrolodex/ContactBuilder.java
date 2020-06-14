@@ -14,7 +14,7 @@ public class ContactBuilder {
     private String email = ""; 
     private LocalDate birthdayLocalDate;
     private YearMonth birthdayYearMonth;
-
+    
     public ContactBuilder(){}
     
     public ContactBuilder(String fName, String mName, String lName, String nickname, String phoneNumber, String email, LocalDate birthday) {
@@ -75,12 +75,14 @@ public class ContactBuilder {
     }
 
     public Contact build(){
+        Contact newContact = new Contact();
         if (birthdayLocalDate == null && birthdayYearMonth != null){
-            return new Contact(fName, mName, lName, nickname, phoneNumber, email, birthdayYearMonth);
+            newContact = new Contact(this.fName, this.mName, this.lName, this.nickname, this.phoneNumber, this.email, this.birthdayYearMonth);
         }
         else{
-            return new Contact(fName, mName, lName, nickname, phoneNumber, email, birthdayLocalDate);
+            newContact = new Contact(this.fName, this.mName, this.lName, this.nickname, this.phoneNumber, this.email, this.birthdayLocalDate);
         }
+        return newContact;
     }
 
 }

@@ -10,6 +10,11 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+@Service
 public class ContactParser {
     private static final String EMAILREGEX = "\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b";
     private static final String NICKNAMEREGEX = "\"(.*?)\"";
@@ -27,7 +32,7 @@ public class ContactParser {
     private YearMonth birthdayYearMonth;
     private Boolean hasBirthday = false;
 
-    /* 
+	/* 
     Each contact has a single-space separated First Name (or initial), optinal Middle Name (or initial), and Last Name (or initial)
     */
     private void parseName(){
@@ -55,6 +60,7 @@ public class ContactParser {
 
         Pattern nickRegex = Pattern.compile(NICKNAMEREGEX);
         Matcher nickMatcher = nickRegex.matcher(this.contactRaw);
+
         // Found a nickname, adding it to the contact and removing from the input string.
         if (nickMatcher.find() != false){
             this.nickname = nickMatcher.group(1);
@@ -63,6 +69,7 @@ public class ContactParser {
 
         Pattern emailRegex = Pattern.compile(EMAILREGEX, Pattern.CASE_INSENSITIVE);
         Matcher emailMatcher = emailRegex.matcher(this.contactRaw);
+
         // Found an email, adding it to the contact and removing from the input string.
         if (emailMatcher.find() != false){
             this.email = emailMatcher.group(0);
@@ -71,6 +78,7 @@ public class ContactParser {
 
         Pattern phoneRegex = Pattern.compile(PHONENUMREGEX);
         Matcher phoneMatcher = phoneRegex.matcher(this.contactRaw);
+
         // Found a phone number, adding it to the contact and removing from the input string.
         if (phoneMatcher.find() != false){
             this.phoneNumber = phoneMatcher.group(0);
@@ -142,16 +150,26 @@ public class ContactParser {
     }
 
     public Contact parseContact(String contactRaw){
+        Contact newContact;
         this.contactRaw = contactRaw;
         parseRegexPatterns();
         this.contactRawSplit = this.contactRaw.split("\\s+");
+        Integer z=0;
+        for(String i:contactRawSplit){
+            System.out.println(i + z++);
+        }
+        if (this.contactRawSplit.length-1 >= 4){
+            //invalid contact information, should have at maximium fName, mName, lName, and birthday.
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //String is not formatted correctly
+        }
         parseBirthday();
         parseName();
         if (birthdayLocalDate == null && birthdayYearMonth != null){
-            return new ContactBuilder().setName(this.fName, this.mName, this.lName).setEmail(this.email).setNickname(this.nickname).setPhoneNumber(this.phoneNumber).setBirthday(this.birthdayYearMonth).build();
+            newContact = new ContactBuilder().setName(this.fName, this.mName, this.lName).setEmail(this.email).setNickname(this.nickname).setPhoneNumber(this.phoneNumber).setBirthday(this.birthdayYearMonth).build();
         }
         else{
-            return new ContactBuilder().setName(this.fName, this.mName, this.lName).setEmail(this.email).setNickname(this.nickname).setPhoneNumber(this.phoneNumber).setBirthday(this.birthdayLocalDate).build();
+            newContact = new ContactBuilder().setName(this.fName, this.mName, this.lName).setEmail(this.email).setNickname(this.nickname).setPhoneNumber(this.phoneNumber).setBirthday(this.birthdayLocalDate).build();
         }
+        return newContact;
     }
 }

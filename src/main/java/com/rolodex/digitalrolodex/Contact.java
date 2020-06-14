@@ -14,7 +14,7 @@ public class Contact{
     */
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long   id;
+    private long   id;
     private String fName;
     private String mName;
     private String lName;
@@ -43,6 +43,10 @@ public class Contact{
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.birthdayYearMonth = birthday;
+    }
+
+    public Long getId(){
+        return this.id;
     }
 
     public String getName(){

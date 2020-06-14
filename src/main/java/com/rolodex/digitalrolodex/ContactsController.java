@@ -20,8 +20,10 @@ class ContactsController {
     @PostMapping("/contactdump/")
     List<Contact> newContacts(@RequestBody String newContact) {
         List<Contact> contacts = new ArrayList<Contact>();
+
+        // handle random empty lines in the input
         newContact = newContact.replaceAll("(?m)^\\s", "");
-        System.out.println(newContact);
+        // seperates by newline (contact)
         String[] contactList = newContact.split("\\R");
         for (String contact: contactList){
             ContactParser parser = new ContactParser();

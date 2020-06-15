@@ -18,7 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class ContactParser {
     private static final String EMAILREGEX = "\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b";
     private static final String NICKNAMEREGEX = "\"(.*?)\"";
-    private static final String PHONENUMREGEX = "\\b[0-9]{10}\\b|[0-9]{3}.[0-9]{3}.[0-9]{4}";
+    private static final String PHONENUMREGEX = "\\b[0-9]{10}\\b|\\(?[0-9]{3}\\)?.[0-9]{3}.[0-9]{4}";
 
     public String contactRaw;
     private String[] contactRawSplit;

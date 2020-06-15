@@ -49,3 +49,7 @@ J. Jonah Jameson
 
 ### Purpose
 This digital rolodex was created as part of a technical interview with an industry leading startup in the cloud governance sector. 
+
+I challenged myself to use Spring Boot, a language used by said company but one I had never used before. I enjoyed the experience and would work with Spring Boot again. However if I started over knowing what I know now about Domain Driven Design I would have approached this project more strategically. Overall I hope this project and its commits effectively illustrate my thought process and my adaptability to learn new things.
+
+If you have any questions feel free to reach out to me, my email is on my profile.

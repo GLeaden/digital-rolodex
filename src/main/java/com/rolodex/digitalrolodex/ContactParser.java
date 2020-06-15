@@ -1,6 +1,7 @@
 package com.rolodex.digitalrolodex;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -30,8 +31,34 @@ public class ContactParser {
     private String email;
     private LocalDate birthdayLocalDate;
     private YearMonth birthdayYearMonth;
+    private Year      birthdayYear;
     private Boolean hasBirthday = false;
+    private DateTimeFormatter yearDateFormatter = DateTimeFormatter.ofPattern( "uuuu" ); // 2019
+    private List<DateTimeFormatter> yearMonthFormatters = new ArrayList<>();
+    private List<DateTimeFormatter> localDateFormatters = new ArrayList<>();
 
+
+    // Load dates once instead of inside the validateDate methods (which can be called multiple times)
+    private void loadDates(){
+        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM-dd-uuuu" ));// 01-23-2019
+        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM/dd/uuuu" ));// 01/23/2019
+        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM.dd.uuuu" ));// 01.23.2019
+        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM-d-uuuu" )); // 01-3-2019
+        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM/d/uuuu" )); // 01/3/2019
+        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM.d.uuuu" )); // 01.3.2019
+        localDateFormatters.add(DateTimeFormatter.ofPattern( "M-d-uuuu" ));  // 1-3-2019
+        localDateFormatters.add(DateTimeFormatter.ofPattern( "M/d/uuuu" ));  // 1/3/2019
+        localDateFormatters.add(DateTimeFormatter.ofPattern( "M.d.uuuu" ));  // 1.3.2019
+
+        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "MM-uuuu" ));   // 01-2019
+        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "M-uuuu" ));    // 1-2019
+        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "MM.uuuu" ));   // 01.2019
+        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "M.uuuu" ));    // 1.2019
+        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "MM/uuuu" ));   // 01/2019
+        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "M/uuuu" ));    // 1/2019
+
+
+    }
 	/* 
     Each contact has a single-space separated First Name (or initial), optinal Middle Name (or initial), and Last Name (or initial)
     */
@@ -96,6 +123,12 @@ public class ContactParser {
             this.birthdayLocalDate = validateLocalDate(birthday);
             if (Objects.isNull(this.birthdayLocalDate)){
                 this.birthdayYearMonth = validateYearMonth(birthday);
+                if(Objects.isNull(this.birthdayYearMonth)){
+                    this.birthdayYear = validateYear(birthday);
+                }
+                if(Objects.isNull(this.birthdayYear)){
+                    //tried to read birthday, wasnt in acceptable format
+                }
             }
         }
         else{
@@ -103,18 +136,8 @@ public class ContactParser {
         }
     }
 
+    // determines if birthday provided is a LocalDate
     private LocalDate validateLocalDate(String date){
-        List<DateTimeFormatter> localDateFormatters = new ArrayList<>();
-
-        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM-dd-uuuu" ));// 01-23-2019
-        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM/dd/uuuu" ));// 01/23/2019
-        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM.dd.uuuu" ));// 01.23.2019
-        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM-d-uuuu" )); // 01-3-2019
-        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM/d/uuuu" )); // 01/3/2019
-        localDateFormatters.add(DateTimeFormatter.ofPattern( "MM.d.uuuu" )); // 01.3.2019
-        localDateFormatters.add(DateTimeFormatter.ofPattern( "M-d-uuuu" ));  // 1-3-2019
-        localDateFormatters.add(DateTimeFormatter.ofPattern( "M/d/uuuu" ));  // 1/3/2019
-        localDateFormatters.add(DateTimeFormatter.ofPattern( "M.d.uuuu" ));  // 1.3.2019
 
         LocalDate dateTime = null;
 
@@ -128,17 +151,11 @@ public class ContactParser {
         return dateTime;
     }
 
+    // determines if birthday provided is a YearMonth
     private YearMonth validateYearMonth(String date){
-        List<DateTimeFormatter> yearMonthFormatters = new ArrayList<>();
-        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "MM-uuuu" ));   // 01-2019
-        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "M-uuuu" ));    // 1-2019
-        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "MM.uuuu" ));   // 01.2019
-        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "M.uuuu" ));    // 1.2019
-        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "MM/uuuu" ));   // 01/2019
-        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "M/uuuu" ));    // 1/2019
-        yearMonthFormatters.add(DateTimeFormatter.ofPattern( "uuuu" ));      // 2019
 
         YearMonth monthTime = null;
+
         for (DateTimeFormatter formatter: yearMonthFormatters){
             try{
                 monthTime = YearMonth.parse(date, formatter);
@@ -149,27 +166,55 @@ public class ContactParser {
         return monthTime;
     }
 
+    // Determines if birthday provided is a Year
+    private Year validateYear(String date){
+
+        Year yearTime = null;
+
+        try{
+            yearTime = Year.parse(date, yearDateFormatter);
+        } catch (DateTimeParseException e){
+            // Ignoring exception, expected.
+        }
+        return yearTime;
+    }
+
+    /*
+    parseContact puts it all together. Reading the easy to parse RegEx patterns first allows us
+    to remove them as we go. Then we split on white space to determine the number of remaining
+    attributes of a contact entry.
+    */
     public Contact parseContact(String contactRaw){
+
         Contact newContact;
         this.contactRaw = contactRaw;
+
         parseRegexPatterns();
+
         this.contactRawSplit = this.contactRaw.split("\\s+");
-        Integer z=0;
-        for(String i:contactRawSplit){
-            System.out.println(i + z++);
-        }
+
+        // invalid contact information, should have at maximium fName, mName, lName, and birthday.
+        // There are more edge cases available that do not handle as gracefully, but this should cover the most common
         if (this.contactRawSplit.length-1 >= 4){
-            //invalid contact information, should have at maximium fName, mName, lName, and birthday.
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST); //String is not formatted correctly
+            // Printing to the console does not count as logging.
+            System.out.println("\"The contact: " + contactRaw + " is not formatted correctly. STOPPING PARSE\"");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The contact: " + contactRaw + " is not formatted correctly."); //String is not formatted correctly
         }
+
+        loadDates();
         parseBirthday();
         parseName();
-        if (birthdayLocalDate == null && birthdayYearMonth != null){
+
+        if (birthdayYearMonth != null){
             newContact = new ContactBuilder().setName(this.fName, this.mName, this.lName).setEmail(this.email).setNickname(this.nickname).setPhoneNumber(this.phoneNumber).setBirthday(this.birthdayYearMonth).build();
+        }
+        else if (birthdayYear != null){
+            newContact = new ContactBuilder().setName(this.fName, this.mName, this.lName).setEmail(this.email).setNickname(this.nickname).setPhoneNumber(this.phoneNumber).setBirthday(this.birthdayYear).build();
         }
         else{
             newContact = new ContactBuilder().setName(this.fName, this.mName, this.lName).setEmail(this.email).setNickname(this.nickname).setPhoneNumber(this.phoneNumber).setBirthday(this.birthdayLocalDate).build();
         }
+
         return newContact;
     }
 }

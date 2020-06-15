@@ -1,6 +1,7 @@
 package com.rolodex.digitalrolodex;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.YearMonth;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,6 +24,7 @@ public class Contact{
     private String email; 
     private LocalDate birthdayLocalDate;
     private YearMonth birthdayYearMonth;
+    private Year      birthdayYear;
 
     Contact(){}
 
@@ -43,6 +45,15 @@ public class Contact{
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.birthdayYearMonth = birthday;
+    }
+    Contact(String fName, String mName, String lName, String nickname, String phoneNumber, String email, Year birthday) {
+        this.fName = fName;
+        this.mName = mName;
+        this.lName = lName;
+        this.nickname = nickname;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.birthdayYear = birthday;
     }
 
     public Long getId(){
@@ -71,6 +82,10 @@ public class Contact{
 
     public YearMonth getBirthdayYearMonth(){
         return this.birthdayYearMonth;
+    }
+
+    public Year getBirthdayYear(){
+        return this.birthdayYear;
     }
 
 

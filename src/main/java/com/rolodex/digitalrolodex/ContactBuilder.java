@@ -1,6 +1,7 @@
 package com.rolodex.digitalrolodex;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.YearMonth;
 
 //Builder pattern for contact creation
@@ -14,6 +15,7 @@ public class ContactBuilder {
     private String email = ""; 
     private LocalDate birthdayLocalDate;
     private YearMonth birthdayYearMonth;
+    private Year      birthdayYear;
     
     public ContactBuilder(){}
     
@@ -35,7 +37,15 @@ public class ContactBuilder {
         this.email = email;
         this.birthdayYearMonth = birthday;
     }
-
+    public ContactBuilder(String fName, String mName, String lName, String nickname, String phoneNumber, String email, Year birthday) {
+        this.fName = fName;
+        this.mName = mName;
+        this.lName = lName;
+        this.nickname = nickname;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.birthdayYear = birthday;
+    }
     public ContactBuilder setName(String fName, String lName){
         this.fName = fName;
         this.lName = lName;
@@ -65,6 +75,7 @@ public class ContactBuilder {
         return this;
     }
 
+    //Overloaded for the various possible birthday Types
     public ContactBuilder setBirthday(LocalDate birthday){
         this.birthdayLocalDate = birthday;
         return this;
@@ -73,15 +84,25 @@ public class ContactBuilder {
         this.birthdayYearMonth = birthday;
         return this;
     }
+    public ContactBuilder setBirthday(Year birthday){
+        this.birthdayYear = birthday;
+        return this;
+    }
 
     public Contact build(){
+
         Contact newContact = new Contact();
-        if (birthdayLocalDate == null && birthdayYearMonth != null){
+
+        if (birthdayYearMonth != null){
             newContact = new Contact(this.fName, this.mName, this.lName, this.nickname, this.phoneNumber, this.email, this.birthdayYearMonth);
+        }
+        else if (birthdayYear != null){
+            newContact = new Contact(this.fName, this.mName, this.lName, this.nickname, this.phoneNumber, this.email, this.birthdayYear);
         }
         else{
             newContact = new Contact(this.fName, this.mName, this.lName, this.nickname, this.phoneNumber, this.email, this.birthdayLocalDate);
         }
+
         return newContact;
     }
 

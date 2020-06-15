@@ -1,4 +1,4 @@
-# Digital Rolodex
+# Digital Rolodex 📇
 
 ### About the project
 

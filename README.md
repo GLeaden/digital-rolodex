@@ -18,7 +18,7 @@ The goal is to take contacts found on a "rolodex" and put them in a computer.
 
 ### Installation
 Installation is simple! 
-1. Make sure you have Java 8 (or higher) installed [click here to learn how to do that]() 
+1. Make sure you have Java 8 (or higher) installed [click here to learn how to do that](https://www.java.com/en/download/help/version_manual.xml) 
 2. You will also need [Maven 3.2+](https://maven.apache.org/download.cgi)
 3. clone this repository with `git clone https://github.com/GLeaden/digital-rolodex.git`
 4. navigate to the newly downloaded project and run this command `./mvnw spring-boot:run` from the main directory
@@ -41,7 +41,7 @@ Once you have the server up and running, the first thing you should do is:
 Below are all *valid* contact entries.
 ```
 Samuel L. Clemens "Mark Twain" marktwain@steamboat.edu 207.478.3823 02.31.1835
-Katherine Johnson "the destroyer" katherine.johnson@dontemailnasa.gov 8884475594 08/26/1918
+Katherine Johnson katherine.johnson@dontemailnasa.gov 8884475594 08/26/1918
 Augusta Ada King "The Countess of Lovelace" 1235556614 ada_lovelace@babbage.math 10/12/1815
 John Oates "Oates" (719) 266-2837 john@hallandoates.com 1948
 J. Jonah Jameson

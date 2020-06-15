@@ -1,10 +1,8 @@
 package com.rolodex.digitalrolodex;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.rolodex.digitalrolodex.Contact;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
